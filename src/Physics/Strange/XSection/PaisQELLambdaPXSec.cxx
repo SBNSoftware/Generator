@@ -108,11 +108,14 @@ double PaisQELLambdaPXSec::XSec(
 
    //Calculate W terms
 
-  double w1 = (Mm2 - q2)/(4*Mnuc2)*TMath::Power((F1V + xiF2V), 2) + (Mp2 - q2)/(4*Mnuc2) * FA2;
-  double w2 = FA2 + TMath::Power((F1V + xiF2V - Mp * xiF2V / (2 * Mnuc)), 2) - q2 / Mnuc2 * TMath::Power((xiF2V / 2), 2);
-  double w3 = 2 * FA * (F1V + xiF2V);
+  // Gordon decomposition for unequal masses (M_Y != M_N): the gamma^mu coefficient is
+  // F1V + (M_N + M_Y) xiF2V / (2 M_N), not F1V + xiF2V (exact only for M_Y = M_N).
+  double FM = F1V + Mp * xiF2V / (2 * Mnuc);
+  double w1 = (Mm2 - q2)/(4*Mnuc2)*TMath::Power(FM, 2) + (Mp2 - q2)/(4*Mnuc2) * FA2;
+  double w2 = FA2 + TMath::Power(F1V, 2) - q2 / Mnuc2 * TMath::Power((xiF2V / 2), 2);
+  double w3 = 2 * FA * FM;
 
-  double xsec = Gf*fSin8c2 / (16*Mnuc2*E2) * (-8*Mnuc2*q2*w1 - 4*(Mnuc2*v2 - q2)*w2 - sign*2*(s - u)*q2*w3 + (s-u)*(s-u)*w2);
+  double xsec = Gf*fSin8c2 / (16*Mnuc2*E2) * (-8*Mnuc2*q2*w1 - 4*Mnuc2*(v2 - q2)*w2 - sign*2*(s - u)*q2*w3 + (s-u)*(s-u)*w2);
   xsec = TMath::Max(xsec,0.);
 
   //----- The algorithm computes dxsec/dQ2
